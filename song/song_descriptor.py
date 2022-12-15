@@ -29,13 +29,23 @@ class SongDescriptor:
         
         On the twelfth day of Christmas my true love gave to me: twelve Drummers Drumming, eleven Pipers Piping, ten Lords-a-Leaping, nine Ladies Dancing, eight Maids-a-Milking, seven Swans-a-Swimming, six Geese-a-Laying, five Gold Rings, four Calling Birds, three French Hens, two Turtle Doves, and a Partridge in a Pear Tree.
         """
+
+
+        self._number_of_lines = len(list(filter(lambda x: x.strip(), self._song.splitlines())))
+        self._array_of_verses = list(filter(lambda x: x.strip(), self._song.splitlines()))
         pass
 
     def describe_whole_song(self):
         return self._song
 
     def describe_single_verse(self, line):
-        pass
+        if not isinstance(line, int):
+            raise TypeError
+        if line <= 0 or line > self._number_of_lines:
+            raise ValueError
+
+        return self._array_of_verses[line - 1].strip()
+
 
     def describe_verse_in_range(self, left, right):
         pass
@@ -72,15 +82,35 @@ class SongDescriptorTest(unittest.TestCase):
         """
         self.assertEqual(descriptor.describe_whole_song(), song)
 
+    def test_describe_single_verse_on_line_0(self):
+        descriptor = SongDescriptor()
+        with self.assertRaises(ValueError):
+            descriptor.describe_single_verse(0)
+
+    def test_describe_single_verse_on_line_1(self):
+        descriptor = SongDescriptor()
+        third_verse = "On the first day of Christmas my true love gave to me: a Partridge in a Pear Tree."
+        self.assertEqual(descriptor.describe_single_verse(1), third_verse)
+
     def test_describe_single_verse_on_line_3(self):
         descriptor = SongDescriptor()
         third_verse = "On the third day of Christmas my true love gave to me: three French Hens, two Turtle Doves, and a Partridge in a Pear Tree."
         self.assertEqual(descriptor.describe_single_verse(3), third_verse)
 
+    def test_describe_single_verse_on_line_12(self):
+        descriptor = SongDescriptor()
+        third_verse = "On the twelfth day of Christmas my true love gave to me: twelve Drummers Drumming, eleven Pipers Piping, ten Lords-a-Leaping, nine Ladies Dancing, eight Maids-a-Milking, seven Swans-a-Swimming, six Geese-a-Laying, five Gold Rings, four Calling Birds, three French Hens, two Turtle Doves, and a Partridge in a Pear Tree."
+        self.assertEqual(descriptor.describe_single_verse(12), third_verse)
+
     def test_describe_single_verse_when_out_of_bound(self):
         descriptor = SongDescriptor()
         with self.assertRaises(ValueError):
             descriptor.describe_single_verse(99)
+
+    def test_describe_single_verse_when_out_of_bound_2(self):
+        descriptor = SongDescriptor()
+        with self.assertRaises(ValueError):
+            descriptor.describe_single_verse(13)
 
     def test_describe_single_verse_when_negative_line_number(self):
         descriptor = SongDescriptor()
